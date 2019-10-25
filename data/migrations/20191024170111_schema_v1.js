@@ -37,5 +37,8 @@ exports.up = function(knex) {
 };
 
 exports.down = function(knex) {
-  knex.schema.dropTableIfExists('state')
+  knex.schema
+  .dropTableIfExists('state')
+  .dropTableIfExists('city')
+  .dropTableIfExists('address')
 };

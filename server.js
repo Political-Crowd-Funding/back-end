@@ -9,7 +9,7 @@ const server = express();
 server.use(cors());
 
 //added security headers
-server.use(helmet);
+server.use(helmet());
 
 //logging
 server.use(morgan('dev'));
