@@ -1,0 +1,3 @@
+folder containing business logic that is independent of web framework.  
+This could be logic underlying some middlewares. These are usually
+items that can change from a business perspective. These will be imported into relevant framework dependent concerns.

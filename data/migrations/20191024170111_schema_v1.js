@@ -2,141 +2,209 @@
 exports.up = function(knex) {
   return knex.schema
   
+
+
   .createTable('state',function(tbl){
       tbl.increments('state_id')
       tbl.string('state_name','225')
   })
 
-  .createTable('city',function(tbl){
-      tbl.increments('city_id')
-      tbl.string('zip_code',10)
-      tbl.string('city_name',225)
-      tbl.unique(['zip_code','city_name'])
-  })
+  
 
-  .createTable('address',function(tbl){
-      tbl.increments('address_id')
-        tbl.string('address',225)
-      tbl
-        .bigInteger('city_id')
-        .unsigned()
-        .notNullable()
-        .references('city_id')
-        .inTable('city')
-        .onUpdate('CASCADE')
-        .onDelete('CASCADE')
-      tbl
-        .bigInteger('state_id')
-        .notNullable()
-        .unsigned()
-        .references('state_id')
-        .inTable('state')
-        .onUpdate('CASCADE')
-        .onDelete('CASCADE')
-  })
-
-  .createTable('roles',function(tbl){
-    tbl.increments('role_id')
-    tbl.string('role_name',10)
-    tbl.unique(['role_name'])
-  })
+   
 
   .createTable('voters',function(tbl){
     tbl.increments('voter_id')
     tbl
+      .boolean('public_official')
+      .defaultTo(false)
+      .notNullable()
+    tbl
       .string('voter_email',225)
     tbl
-      .bigInteger('street_id')
-      .unsigned()
-      .notNullable()
-      .references('address_id')
-      .inTable('address')
-      .onUpdate('CASCADE')
-      .onDelete('CASCADE')
+      .string('street_address',225)
     tbl
       .boolean('registered')
     tbl
-      .bigInteger('role_id')
+      .bigInteger('state_id')
       .unsigned()
       .notNullable()
-      .references('roleBridgeId')
-      .inTable('roleBridgeTable')
-      .onDelete('CASCADE')
-      .onUpdate('CASCADE')
-  })
-
-  .createTable('roleBridgeTable',function(tbl){
-    tbl.increments('roleBridgeId')
-    tbl
-      .bigInteger('voter_id')
-      .references('voter_id')
-      .inTable('voters')
-      .notNullable()
-      .unsigned()
+      .references('state_id')
+      .inTable('state')
       .onUpdate('CASCADE')
       .onDelete('CASCADE')
-    tbl
-      .bigInteger('role_id')
-      .references('role_id')
-      .inTable('roles')
-      .notNullable()
-      .unsigned()
-      .onUpdate('CASCADE')
-      .onDelete('CASCADE')
-
+  
   })
 
-  .createTable('political_party',function(tbl){
-    tbl.increments('party_id')
-    tbl
-      .string('name',225)
-  })
+ 
 
   .createTable('public_official',function(tbl){
     tbl.increments('pub_official_id')
+    tbl
+      .boolean('public_official')
+      .defaultTo(true)//unsure if this needs to be knex.value.true
+      .notNullable()
     tbl
       .string('first',225)
     tbl
       .string('last',225)
     tbl
       .string('phone',12)
+
+    tbl
+      .string('email',225)
+
     tbl
       .string('website',225)
+      .nullable()
+    
+    tbl
+    .string('street_address',225)
+
+
 
     tbl
-      .string('district',225)
-
-    tbl
-      .bigInteger('address_id')
+      .bigInteger('state_id')
       .unsigned()
       .notNullable()
-      .references('address_id')
-      .inTable('address')
+      .references('state_id')
+      .inTable('state')
       .onUpdate('CASCADE')
       .onDelete('CASCADE')
 
-    tbl
-      .bigInteger('party_id')
-      .unsigned()
-      .notNullable()
-      .references('party_id')
-      .inTable('political_party')
-      .onUpdate('CASCADE')
-      .onDelete('CASCADE')
+
   })
 
+  //not sure how I am currently allowed to truncate tables with fk constraints after deleting the records in each
+
+  .createTable('tags',function(tbl){
+    tbl.increments('tag_id')
+    tbl.string('tag_name',225)
+    .notNullable();
+
+  })
+
+  
+  //posts table
+  .createTable('posts',function(tbl){
+    tbl.increments('post_id')
+    tbl
+      .bigInteger('voter_id')
+      .unsigned()
+      .nullable()
+      .references('voter_id')
+      .inTable('voters')
+    tbl
+      .bigInteger('pub_official_id')
+      .unsigned()
+      .nullable()
+      .references('pub_official_id')
+      .inTable('public_official')
+    tbl
+      .text('post_body')
+    tbl
+      .timestamp('created_at').defaultTo(knex.fn.now());
+    tbl
+      //need reference to computed like total (or cached total here)
+
+   
+
+  })
+
+  //bridge table for unique tags for each post
+
+  .createTable('tags_bridge',function(tbl){
+    tbl
+      .increments('tag_bridge_id')
+    
+    tbl
+      .bigInteger('tag_id')
+      .unsigned()
+      .notNullable()
+      .references('tag_id')
+      .inTable('tags')
+    
+    tbl
+      .bigInteger('post_id')
+      .unsigned()
+      .notNullable()
+      .references('post_id')
+      .inTable('posts')
+  })
+
+  //if we want a polling feture it would be good to be able to tie user identity to likes 
+  //hence the FK columns (or just to be able to get demographics on who liked a post, eventually)
+
+  .createTable('likes', function(tbl){
+    tbl.increments('like_id')
+    tbl
+        .integer('like_count')
+        .defaultTo(1)
+        .nullable()
+    tbl
+        .bigInteger('voter_id')
+        .nullable()
+        .unsigned()
+        .references('voter_id')
+        .inTable('voters')
+        .defaultTo(null)
+
+    tbl
+      .bigInteger('politician_id')
+      .nullable()
+      .unsigned()
+      .references('politician_id')
+      .inTable('politicians')
+      .defaultTo(null)
+
+    tbl
+    .timestamp('created_at').defaultTo(knex.fn.now());
+
+    
+  })
+
+  .createTable('comments',function(tbl){
+    tbl
+      .increments('comment_id')
+
+    tbl
+      .text('comment_body')
+    
+    tbl
+      .bigInteger('post_id')
+      .unsigned()
+      .notNullable()
+      .references('post_id')
+      .inTable('posts')
+
+    tbl
+    .timestamp('created_at').defaultTo(knex.fn.now());
+
+    tbl
+      .bigInteger('user_id')
+      .notNullable()
+      .unsigned()
+      //need to see if this is the best approach here
+      //should this be a unique value?
+      //there could be duplicates so probably not
+
+  })
+
+
+  //tags bridge
   
 };
 
 exports.down = function(knex) {
   knex.schema
   .dropTableIfExists('state')
-  .dropTableIfExists('city')
-  .dropTableIfExists('address')
-  .dropTableIfExists('roles')
   .dropTableIfExists('voters')
-  .dropTableIfExists('roleBridgeTable')
-  .dropTableIfExists('political_party')
   .dropTableIfExists('public_official')
+  .dropTableIfExists('tags')
+  .dropTableIfExists('tags_bridge')
+  .dropTableIfExists('likes')
+  .dropTableIfExists('posts')
+  .dropTableIfExists('comments')
+  .dropTableIfExists('likes')
 
 };
