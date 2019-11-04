@@ -224,9 +224,8 @@ exports.down = function(knex) {
   .dropTableIfExists('public_official')
   .dropTableIfExists('tags')
   .dropTableIfExists('tags_bridge')
-  .dropTableIfExists('likes')
   .dropTableIfExists('posts')
-  .dropTableIfExists('comments')
   .dropTableIfExists('likes')
+  .dropTableIfExists('comments')
 
 };
