@@ -75,7 +75,7 @@ exports.up = function(knex) {
 
   })
 
-  //not sure how I am currently allowed to truncate tables with fk constraints after deleting the records in each
+ 
 
   .createTable('tags',function(tbl){
     tbl.increments('tag_id')
@@ -94,18 +94,22 @@ exports.up = function(knex) {
       .nullable()
       .references('voter_id')
       .inTable('voters')
+      .onDelete('CASCADE')
+      .onUpdate('CASCADE')
     tbl
       .bigInteger('pub_official_id')
       .unsigned()
       .nullable()
       .references('pub_official_id')
       .inTable('public_official')
+      .onDelete('CASCADE')
+      .onUpdate('CASCADE')
+
     tbl
       .text('post_body')
     tbl
       .timestamp('created_at').defaultTo(knex.fn.now());
-    tbl
-      //need reference to computed like total (or cached total here)
+   
 
    
 
@@ -123,6 +127,8 @@ exports.up = function(knex) {
       .notNullable()
       .references('tag_id')
       .inTable('tags')
+      .onDelete('CASCADE')
+      .onUpdate('CASCADE')
     
     tbl
       .bigInteger('post_id')
@@ -130,6 +136,8 @@ exports.up = function(knex) {
       .notNullable()
       .references('post_id')
       .inTable('posts')
+      .onDelete('CASCADE')
+      .onUpdate('CASCADE')
   })
 
   //if we want a polling feture it would be good to be able to tie user identity to likes 
@@ -137,6 +145,16 @@ exports.up = function(knex) {
 
   .createTable('likes', function(tbl){
     tbl.increments('like_id')
+
+    tbl
+      .bigInteger('post_id')
+      .notNullable()
+      .unsigned()
+      .references('post_id')
+      .inTable('posts')
+      .onDelete('CASCADE')
+      .onUpdate('CASCADE')
+
     tbl
         .integer('like_count')
         .defaultTo(1)
@@ -156,6 +174,8 @@ exports.up = function(knex) {
       .references('politician_id')
       .inTable('politicians')
       .defaultTo(null)
+      .onDelete('CASCADE')
+      .onUpdate('CASCADE')
 
     tbl
     .timestamp('created_at').defaultTo(knex.fn.now());
@@ -176,6 +196,8 @@ exports.up = function(knex) {
       .notNullable()
       .references('post_id')
       .inTable('posts')
+      .onDelete('CASCADE')
+      .onUpdate('CASCADE')
 
     tbl
     .timestamp('created_at').defaultTo(knex.fn.now());
