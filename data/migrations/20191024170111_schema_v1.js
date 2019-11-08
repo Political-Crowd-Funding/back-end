@@ -9,6 +9,16 @@ exports.up = function(knex) {
       tbl.string('state_name','225')
   })
 
+  .createTable('public_official',function(tbl){
+    tbl.increments('pub_official_id')
+
+    tbl
+      .string('phone',12)
+
+    tbl
+      .string('website',225)
+
+  })
   
   .createTable('users',function(tbl){
     tbl.increments('user_id')
@@ -39,16 +49,7 @@ exports.up = function(knex) {
 
  
 
-  .createTable('public_official',function(tbl){
-    tbl.increments('pub_official_id')
-
-    tbl
-      .string('phone',12)
-
-    tbl
-      .string('website',225)
-
-  })
+  
 
  
 
