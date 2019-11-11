@@ -82,11 +82,13 @@ exports.up = function(knex) {
     tbl
       .bigInteger('vote_tally')
       .defaultTo(0)
+      //unsure if we still encounter scaling issues from inserts
+      //on vote_table triggering an increment on this field.
+      //I think you still encounter write locking and blocking
+      //if two users are concurrently liking the same post.
+      //this could scale into a bottleneck
    
-    //likes
-    //transaction
-    //big int
-    //default to zero
+    
 
    
 
