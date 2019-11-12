@@ -1,0 +1,19 @@
+pgbench pc_be -f /Users/dustinbailey/back-end/sql/pg_bench/concurrent_upsert.sql
+
+pgbench pc_be -c 100 -f /Users/dustinbailey/back-end/sql/pg_bench/concurrent_upsert.sql
+
+pgbench pc_be -c 100 -f /Users/dustinbailey/back-end/sql/pg_bench/concurrent_upsert.sql --report-latencies
+
+
+statement latencies in milliseconds:
+         4.474  /* script file used for pgbench */
+         0.003  \set pid random(1, 200)
+         0.000  \set uid random(1, 40)
+        20.369  INSERT INTO vote_table(post_id,user_id) VALUES(:pid,:uid) ON CONFLICT DO NOTHING;
+
+
+statement latencies in milliseconds:
+         4.255  /* script file used for pgbench */
+         0.001  \set pid random(1, 200)
+         0.000  \set uid random(1, 40)
+        14.165  INSERT INTO vote_table(post_id,user_id) VALUES(:pid,:uid) ON CONFLICT DO NOTHING;
